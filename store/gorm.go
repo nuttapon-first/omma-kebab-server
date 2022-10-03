@@ -2,7 +2,9 @@ package store
 
 import (
 	"database/sql"
+	"math"
 
+	"github.com/nuttapon-first/omma-kebab-server/modules/pkg"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +22,7 @@ type Storer interface {
 	Begin() *gorm.DB
 	Table(string) (tx *gorm.DB)
 	Save(interface{}) (tx *gorm.DB)
+	Paginate(interface{}, *pkg.Pagination, *gorm.DB) func(db *gorm.DB) *gorm.DB
 }
 
 func (s *GormStore) New(table interface{}) error {
@@ -68,4 +71,17 @@ func (s *GormStore) Save(table interface{}) (tx *gorm.DB) {
 
 func NewGormStore(db *gorm.DB) *GormStore {
 	return &GormStore{db: db}
+}
+
+func (s *GormStore) Paginate(value interface{}, pagination *pkg.Pagination, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+	var totalRows int64
+	db.Count(&totalRows)
+
+	pagination.TotalRows = totalRows
+	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.Limit)))
+	pagination.TotalPages = totalPages
+
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Offset(pagination.GetOffset()).Limit(pagination.GetLimit()).Order(pagination.GetSort())
+	}
 }

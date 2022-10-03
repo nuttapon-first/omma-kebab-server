@@ -9,6 +9,7 @@ import (
 
 	"github.com/nuttapon-first/omma-kebab-server/modules/dto"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
+	"github.com/nuttapon-first/omma-kebab-server/modules/pkg"
 	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 	"gorm.io/gorm"
@@ -215,9 +216,45 @@ func (h *TransactionHandler) GetList(c router.Context) {
 		endDate = end.Format(timeFormat)
 	}
 
+	page, _ := strconv.Atoi(c.Query("page"))
+	if page <= 0 {
+		page = 1
+	}
+
+	pageSize, _ := strconv.Atoi(c.Query("page_size"))
+	sortQuery := c.Query("sort")
+	sort := ""
+	if sortQuery != "" {
+		direction := c.Query("sortDesc")
+		if direction != "" {
+			if direction == "true" {
+				sort = sortQuery + " desc"
+			} else if direction == "false" {
+				sort = sortQuery + " asc"
+			}
+		}
+
+	}
+
+	switch {
+	case pageSize <= 0:
+		pageSize = 30
+	}
+
+	pagination := &pkg.Pagination{
+		Page:  page,
+		Limit: pageSize,
+	}
+
+	if sort != "" {
+		pagination.Sort = sort
+	} else {
+		pagination.Sort = "created_at desc"
+	}
+
 	where := fmt.Sprintf("Transactions.created_at BETWEEN '%s' AND '%s'", startDate, endDate)
 	selectRow := "`Transactions`.`id`,`Transactions`.`created_at`,`Transactions`.`updated_at`,`Transactions`.`menu_id`,`Transactions`.`branch`,`Transactions`.`transaction_type`,`Transactions`.`channel`,`Transactions`.`transaction_price`,`Transactions`.`transaction_unit`,`Transactions`.`fee`,`Transactions`.`vat`,`Transactions`.`discount`,`Transactions`.`total_price`,`Transactions`.`total_cost`,`Transactions`.`total_profit`,`Transactions`.`total_profit_percent`,`Transactions`.`payment_channel`,`Transactions`.`add_on`, `MenuList`.`menu_name`"
-	rows, err := h.store.Table("Transactions").Order("created_at asc").Select(selectRow).Joins("join MenuList on Transactions.menu_id = MenuList.id").Where(where).Rows()
+	rows, err := h.store.Table("Transactions").Scopes(h.store.Paginate(&model.Transaction{}, pagination, h.store.Table("Transactions"))).Select(selectRow).Joins("join MenuList on Transactions.menu_id = MenuList.id").Where(where).Rows()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"error": err.Error(),
@@ -231,6 +268,8 @@ func (h *TransactionHandler) GetList(c router.Context) {
 	for rows.Next() {
 		h.store.ScanRows(rows, transactionList)
 	}
+
+	pagination.Rows = *transactionList
 
 	salesReport := &dto.SalesReport{
 		Transactions: transactionList,
@@ -251,8 +290,8 @@ func (h *TransactionHandler) GetList(c router.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"success":     0,
-		"salesReport": salesReport,
+		"success":      0,
+		"transactions": pagination,
 	})
 }
 
