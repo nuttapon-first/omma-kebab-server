@@ -254,7 +254,7 @@ func (h *TransactionHandler) GetList(c router.Context) {
 
 	where := fmt.Sprintf("Transactions.created_at BETWEEN '%s' AND '%s'", startDate, endDate)
 	selectRow := "`Transactions`.`id`,`Transactions`.`created_at`,`Transactions`.`updated_at`,`Transactions`.`menu_id`,`Transactions`.`branch`,`Transactions`.`transaction_type`,`Transactions`.`channel`,`Transactions`.`transaction_price`,`Transactions`.`transaction_unit`,`Transactions`.`fee`,`Transactions`.`vat`,`Transactions`.`discount`,`Transactions`.`total_price`,`Transactions`.`total_cost`,`Transactions`.`total_profit`,`Transactions`.`total_profit_percent`,`Transactions`.`payment_channel`,`Transactions`.`add_on`, `MenuList`.`menu_name`"
-	rows, err := h.store.Table("Transactions").Scopes(h.store.Paginate(&model.Transaction{}, pagination, h.store.Table("Transactions"))).Select(selectRow).Joins("join MenuList on Transactions.menu_id = MenuList.id").Where(where).Rows()
+	rows, err := h.store.Table("Transactions").Where(where).Scopes(h.store.Paginate(&model.Transaction{}, pagination, h.store.Table("Transactions"), where)).Select(selectRow).Joins("join MenuList on Transactions.menu_id = MenuList.id").Rows()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"error": err.Error(),
