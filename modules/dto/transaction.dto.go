@@ -12,8 +12,6 @@ type TransactionDto struct {
 	Channel          string   `json:"channel" binding:"required"`
 	TransactionPrice int      `json:"transactionPrice" binding:"required"`
 	TransactionUnit  int      `json:"transactionUnit" binding:"required"`
-	Fee              float32  `json:"fee"`
-	Vat              float32  `json:"vat"`
 	Discount         float32  `json:"discount"`
 	PaymentChannel   string   `json:"paymentChannel" binding:"required"`
 	AddOns           []AddOns `gorm:"-" json:"addOns"`

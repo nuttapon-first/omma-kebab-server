@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
+	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 )
 
@@ -23,7 +23,7 @@ func NewMenuHandler(store store.Storer) *MenuHandler {
 
 // ////////////////////////////////////////////////////////////////////
 
-func (m *MenuHandler) NewMenu(c *gin.Context) {
+func (m *MenuHandler) NewMenu(c router.Context) {
 	menu := &model.Menu{}
 
 	if err := c.ShouldBindJSON(menu); err != nil {
@@ -53,7 +53,7 @@ func (m *MenuHandler) NewMenu(c *gin.Context) {
 	})
 }
 
-func (m *MenuHandler) GetMenuList(c *gin.Context) {
+func (m *MenuHandler) GetMenuList(c router.Context) {
 	menus := &[]model.Menu{}
 	err := m.store.Find(menus, &model.Menu{}, "")
 	if err != nil {
@@ -70,7 +70,7 @@ func (m *MenuHandler) GetMenuList(c *gin.Context) {
 	})
 }
 
-func (m *MenuHandler) GetMenuById(c *gin.Context) {
+func (m *MenuHandler) GetMenuById(c router.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -95,7 +95,7 @@ func (m *MenuHandler) GetMenuById(c *gin.Context) {
 	})
 }
 
-func (m *MenuHandler) EditById(c *gin.Context) {
+func (m *MenuHandler) EditById(c router.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -176,7 +176,7 @@ func (m *MenuHandler) EditById(c *gin.Context) {
 	})
 }
 
-func (m *MenuHandler) RemoveById(c *gin.Context) {
+func (m *MenuHandler) RemoveById(c router.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.Atoi(idParam)

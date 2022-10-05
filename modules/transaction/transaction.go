@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/dto"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
 	"github.com/nuttapon-first/omma-kebab-server/modules/pkg"
+	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 	"gorm.io/gorm"
 )
@@ -28,7 +28,7 @@ func NewTransactionHandler(store store.Storer) *TransactionHandler {
 
 // ////////////////////////////////////////////////////////////////////
 
-func (h *TransactionHandler) New(c *gin.Context) {
+func (h *TransactionHandler) New(c router.Context) {
 	payload := &dto.TransactionDto{}
 
 	if err := c.ShouldBindJSON(payload); err != nil {
@@ -37,8 +37,6 @@ func (h *TransactionHandler) New(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Printf("%#v\n", payload)
 
 	// convert unix millisecond to time
 	createTime := time.Unix(0, int64(payload.CreatedAt)*int64(time.Millisecond))
@@ -51,8 +49,6 @@ func (h *TransactionHandler) New(c *gin.Context) {
 		Channel:          payload.Channel,
 		TransactionPrice: payload.TransactionPrice,
 		TransactionUnit:  payload.TransactionUnit,
-		Fee:              payload.Fee,
-		Vat:              payload.Vat,
 		Discount:         payload.Discount,
 		PaymentChannel:   payload.PaymentChannel,
 	}
@@ -64,7 +60,7 @@ func (h *TransactionHandler) New(c *gin.Context) {
 		return
 	}
 
-	if transaction.TransactionType == "sales" && transaction.TransactionPrice <= 0 || transaction.TransactionType == "expenditure" && transaction.TransactionPrice >= 0 {
+	if transaction.TransactionPrice <= 0 {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"error": "invalid type and price",
 		})
@@ -183,7 +179,7 @@ func (h *TransactionHandler) New(c *gin.Context) {
 	})
 }
 
-func (h *TransactionHandler) GetList(c *gin.Context) {
+func (h *TransactionHandler) GetList(c router.Context) {
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
 	timeFormat := "2006-01-02 15:04:05"
@@ -283,7 +279,7 @@ func (h *TransactionHandler) GetList(c *gin.Context) {
 	})
 }
 
-func (h *TransactionHandler) GetById(c *gin.Context) {
+func (h *TransactionHandler) GetById(c router.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -308,7 +304,7 @@ func (h *TransactionHandler) GetById(c *gin.Context) {
 	})
 }
 
-func (h *TransactionHandler) RemoveById(c *gin.Context) {
+func (h *TransactionHandler) RemoveById(c router.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.Atoi(idParam)

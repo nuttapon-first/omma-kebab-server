@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
+	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 	"gorm.io/gorm"
 )
@@ -23,7 +23,7 @@ func NewStockHandler(store store.Storer) *StockHandler {
 
 // ////////////////////////////////////////////////////////////////////
 
-func (h *StockHandler) New(c *gin.Context) {
+func (h *StockHandler) New(c router.Context) {
 	stock := &model.Stock{}
 
 	if err := c.ShouldBindJSON(stock); err != nil {
@@ -53,7 +53,7 @@ func (h *StockHandler) New(c *gin.Context) {
 	})
 }
 
-func (h *StockHandler) GetList(c *gin.Context) {
+func (h *StockHandler) GetList(c router.Context) {
 	stocks := &[]model.Stock{}
 	err := h.store.Find(stocks, &model.Stock{}, "")
 	if err != nil {
@@ -69,7 +69,7 @@ func (h *StockHandler) GetList(c *gin.Context) {
 	})
 }
 
-func (h *StockHandler) GetById(c *gin.Context) {
+func (h *StockHandler) GetById(c router.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -94,7 +94,7 @@ func (h *StockHandler) GetById(c *gin.Context) {
 	})
 }
 
-func (h *StockHandler) AddById(c *gin.Context) {
+func (h *StockHandler) AddById(c router.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -127,7 +127,7 @@ func (h *StockHandler) AddById(c *gin.Context) {
 	})
 }
 
-func (h *StockHandler) EditById(c *gin.Context) {
+func (h *StockHandler) EditById(c router.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -160,7 +160,7 @@ func (h *StockHandler) EditById(c *gin.Context) {
 	})
 }
 
-func (h *StockHandler) RemoveById(c *gin.Context) {
+func (h *StockHandler) RemoveById(c router.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.Atoi(idParam)

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/dto"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
 	"github.com/nuttapon-first/omma-kebab-server/modules/pkg"
+	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 )
 
@@ -25,7 +25,7 @@ func NewExpenseHandler(store store.Storer) *ExpenseHandler {
 
 // ////////////////////////////////////////////////////////////////////
 
-func (h *ExpenseHandler) New(c *gin.Context) {
+func (h *ExpenseHandler) New(c router.Context) {
 	payload := &dto.ExpenseDto{}
 
 	if err := c.ShouldBindJSON(payload); err != nil {
@@ -64,7 +64,7 @@ func (h *ExpenseHandler) New(c *gin.Context) {
 	})
 }
 
-func (h *ExpenseHandler) GetList(c *gin.Context) {
+func (h *ExpenseHandler) GetList(c router.Context) {
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
 	timeFormat := "2006-01-02 15:04:05"
@@ -109,7 +109,7 @@ func (h *ExpenseHandler) GetList(c *gin.Context) {
 	})
 }
 
-// func (h *ExpenseHandler) RemoveById(c *gin.Context) {
+// func (h *ExpenseHandler) RemoveById(c router.Context) {
 // 	idParam := c.Param("id")
 
 // 	id, err := strconv.Atoi(idParam)
