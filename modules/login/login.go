@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/auth"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
-	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,7 +24,7 @@ func NewLoginHandler(store store.Storer) *LoginHandler {
 
 // ////////////////////////////////////////////////////////////////////
 
-func (h *LoginHandler) Login(c router.Context) {
+func (h *LoginHandler) Login(c *gin.Context) {
 	login := &model.LoginUser{}
 
 	secret := os.Getenv("JWT_SECRET")
@@ -36,7 +36,7 @@ func (h *LoginHandler) Login(c router.Context) {
 		return
 	}
 
-	if err := c.Bind(login); err != nil {
+	if err := c.ShouldBindJSON(login); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"success": 2,
 			"error":   err.Error(),

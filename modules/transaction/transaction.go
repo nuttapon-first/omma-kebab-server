@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/dto"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
 	"github.com/nuttapon-first/omma-kebab-server/modules/pkg"
-	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 	"gorm.io/gorm"
 )
@@ -28,10 +28,10 @@ func NewTransactionHandler(store store.Storer) *TransactionHandler {
 
 // ////////////////////////////////////////////////////////////////////
 
-func (h *TransactionHandler) New(c router.Context) {
+func (h *TransactionHandler) New(c *gin.Context) {
 	payload := &dto.TransactionDto{}
 
-	if err := c.Bind(payload); err != nil {
+	if err := c.ShouldBindJSON(payload); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"error": err.Error(),
 		})
@@ -183,7 +183,7 @@ func (h *TransactionHandler) New(c router.Context) {
 	})
 }
 
-func (h *TransactionHandler) GetList(c router.Context) {
+func (h *TransactionHandler) GetList(c *gin.Context) {
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
 	timeFormat := "2006-01-02 15:04:05"
@@ -283,7 +283,7 @@ func (h *TransactionHandler) GetList(c router.Context) {
 	})
 }
 
-func (h *TransactionHandler) GetById(c router.Context) {
+func (h *TransactionHandler) GetById(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -308,7 +308,7 @@ func (h *TransactionHandler) GetById(c router.Context) {
 	})
 }
 
-func (h *TransactionHandler) RemoveById(c router.Context) {
+func (h *TransactionHandler) RemoveById(c *gin.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.Atoi(idParam)

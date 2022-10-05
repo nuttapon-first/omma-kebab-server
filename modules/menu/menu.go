@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
-	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 )
 
@@ -23,10 +23,10 @@ func NewMenuHandler(store store.Storer) *MenuHandler {
 
 // ////////////////////////////////////////////////////////////////////
 
-func (m *MenuHandler) NewMenu(c router.Context) {
+func (m *MenuHandler) NewMenu(c *gin.Context) {
 	menu := &model.Menu{}
 
-	if err := c.Bind(menu); err != nil {
+	if err := c.ShouldBindJSON(menu); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"error": err.Error(),
 		})
@@ -53,7 +53,7 @@ func (m *MenuHandler) NewMenu(c router.Context) {
 	})
 }
 
-func (m *MenuHandler) GetMenuList(c router.Context) {
+func (m *MenuHandler) GetMenuList(c *gin.Context) {
 	menus := &[]model.Menu{}
 	err := m.store.Find(menus, &model.Menu{}, "")
 	if err != nil {
@@ -70,7 +70,7 @@ func (m *MenuHandler) GetMenuList(c router.Context) {
 	})
 }
 
-func (m *MenuHandler) GetMenuById(c router.Context) {
+func (m *MenuHandler) GetMenuById(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -95,7 +95,7 @@ func (m *MenuHandler) GetMenuById(c router.Context) {
 	})
 }
 
-func (m *MenuHandler) EditById(c router.Context) {
+func (m *MenuHandler) EditById(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -107,7 +107,7 @@ func (m *MenuHandler) EditById(c router.Context) {
 
 	idPayload := map[string]interface{}{"ID": id}
 	menu := &model.EditMenu{}
-	if err := c.Bind(menu); err != nil {
+	if err := c.ShouldBindJSON(menu); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"error": err.Error(),
 		})
@@ -176,7 +176,7 @@ func (m *MenuHandler) EditById(c router.Context) {
 	})
 }
 
-func (m *MenuHandler) RemoveById(c router.Context) {
+func (m *MenuHandler) RemoveById(c *gin.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.Atoi(idParam)

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/nuttapon-first/omma-kebab-server/modules/dto"
-	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 )
 
@@ -19,7 +19,7 @@ func NewReportHandler(store store.Storer) *ReportHandler {
 	return &ReportHandler{store: store}
 }
 
-func (h *ReportHandler) GetDashboard(c router.Context) {
+func (h *ReportHandler) GetDashboard(c *gin.Context) {
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
 	t := time.Now()
