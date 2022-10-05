@@ -76,7 +76,7 @@ func (h *ExpenseHandler) GetList(c router.Context) {
 		return
 	}
 
-	endDate, err = pkg.FormatDateQuery(timeFormat, startDate)
+	endDate, err = pkg.FormatDateQuery(timeFormat, endDate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"error": err.Error(),
