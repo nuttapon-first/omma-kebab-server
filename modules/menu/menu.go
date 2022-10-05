@@ -40,6 +40,13 @@ func (m *MenuHandler) NewMenu(c router.Context) {
 		return
 	}
 
+	if menu.MenuUnit <= 0 {
+		c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "unit should greater than zero",
+		})
+		return
+	}
+
 	err := m.store.New(menu)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
