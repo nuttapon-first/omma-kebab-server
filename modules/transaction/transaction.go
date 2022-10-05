@@ -186,34 +186,22 @@ func (h *TransactionHandler) New(c router.Context) {
 func (h *TransactionHandler) GetList(c router.Context) {
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
-	t := time.Now()
 	timeFormat := "2006-01-02 15:04:05"
-	if startDate == "" {
-		year, month, day := t.Date()
-		startDate = time.Date(year, month, day, 0, 0, 0, 0, t.Location()).Format(timeFormat)
-	} else {
-		start, err := time.Parse("20060102150405", startDate)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"error": err.Error(),
-			})
-			return
-		}
-		startDate = start.Format(timeFormat)
+
+	startDate, err := pkg.FormatDateQuery(timeFormat, startDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
 	}
 
-	if endDate == "" {
-		year, month, day := t.Date()
-		endDate = time.Date(year, month, day, 23, 59, 59, 59, t.Location()).Format(timeFormat)
-	} else {
-		end, err := time.Parse("20060102150405", endDate)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"error": err.Error(),
-			})
-			return
-		}
-		endDate = end.Format(timeFormat)
+	endDate, err = pkg.FormatDateQuery(timeFormat, endDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
 	}
 
 	page, _ := strconv.Atoi(c.Query("page"))

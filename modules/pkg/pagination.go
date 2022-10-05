@@ -15,7 +15,7 @@ func (p *Pagination) GetOffset() int {
 
 func (p *Pagination) GetLimit() int {
 	if p.Limit == 0 {
-		p.Limit = 10
+		p.Limit = 30
 	}
 	return p.Limit
 }
@@ -29,7 +29,7 @@ func (p *Pagination) GetPage() int {
 
 func (p *Pagination) GetSort() string {
 	if p.Sort == "" {
-		p.Sort = "Id desc"
+		p.Sort = "id desc"
 	}
 	return p.Sort
 }

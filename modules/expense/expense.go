@@ -7,6 +7,7 @@ import (
 
 	"github.com/nuttapon-first/omma-kebab-server/modules/dto"
 	"github.com/nuttapon-first/omma-kebab-server/modules/model"
+	"github.com/nuttapon-first/omma-kebab-server/modules/pkg"
 	"github.com/nuttapon-first/omma-kebab-server/router"
 	"github.com/nuttapon-first/omma-kebab-server/store"
 )
@@ -66,40 +67,27 @@ func (h *ExpenseHandler) New(c router.Context) {
 func (h *ExpenseHandler) GetList(c router.Context) {
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
-	t := time.Now()
 	timeFormat := "2006-01-02 15:04:05"
-	if startDate == "" {
-		year, month, day := t.Date()
-		startDate = time.Date(year, month, day, 0, 0, 0, 0, t.Location()).Format(timeFormat)
-	} else {
-		start, err := time.Parse("20060102150405", startDate)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"error": err.Error(),
-			})
-			return
-		}
-		startDate = start.Format(timeFormat)
+	startDate, err := pkg.FormatDateQuery(timeFormat, startDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
 	}
 
-	if endDate == "" {
-		year, month, day := t.Date()
-		endDate = time.Date(year, month, day, 23, 59, 59, 59, t.Location()).Format(timeFormat)
-	} else {
-		end, err := time.Parse("20060102150405", endDate)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"error": err.Error(),
-			})
-			return
-		}
-		endDate = end.Format(timeFormat)
+	endDate, err = pkg.FormatDateQuery(timeFormat, startDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
 	}
 
 	where := fmt.Sprintf("Expenses.created_at BETWEEN '%s' AND '%s'", startDate, endDate)
 
 	expenses := &[]dto.ExpenseList{}
-	err := h.store.Table("Expenses").Order("created_at asc").Where(where).Find(expenses).Error
+	err = h.store.Table("Expenses").Order("created_at asc").Where(where).Find(expenses).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"error": err.Error(),
