@@ -50,9 +50,10 @@ func main() {
 	gormStore := store.NewGormStore(db)
 
 	loginHandler := login.NewLoginHandler(gormStore)
-	r.POST("/login", loginHandler.Login)
 
 	v1 := r.Group("/v1")
+	v1.POST("/login", loginHandler.Login)
+
 	v1.Use(middleware.JwtGuard())
 	{
 		menuHandler := menu.NewMenuHandler(gormStore)
