@@ -32,7 +32,7 @@ type testCases struct {
 	MessageExpected string
 }
 
-func TestCreateStockFailure(t *testing.T) {
+func TestCreateMenuFailure(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []testCases{

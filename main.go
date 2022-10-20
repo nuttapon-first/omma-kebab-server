@@ -55,6 +55,7 @@ func main() {
 	v1.POST("/login", loginHandler.Login)
 
 	v1.Use(middleware.JwtGuard())
+	v1.Use(middleware.Authorization("admin", "manager"))
 	{
 		menuHandler := menu.NewMenuHandler(gormStore)
 		v1.POST("menus", router.NewGinHandler(menuHandler.NewMenu))

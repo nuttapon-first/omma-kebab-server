@@ -9,6 +9,7 @@ import (
 type UserInfo struct {
 	UserID   int    `json:"userId"`
 	UserName string `json:"userName"`
+	UserRole string `json:"userRole"`
 }
 
 type CustomJWTClaims struct {
@@ -22,7 +23,7 @@ func GenerateAccessToken(signature string, userDetails UserInfo) (string, error)
 			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
 			// Audience:  "Nuttapon",
 		},
-		UserInfo{userDetails.UserID, userDetails.UserName},
+		UserInfo{userDetails.UserID, userDetails.UserName, userDetails.UserRole},
 
 		// UserInfo{"1234", "Nuttapon", "SuperAdmin"},
 	})

@@ -93,6 +93,7 @@ func (h *LoginHandler) Login(c *gin.Context) {
 	userInfo := auth.UserInfo{
 		UserID:   user.ID,
 		UserName: user.UserFullName,
+		UserRole: user.UserRole,
 	}
 
 	token, err := auth.GenerateAccessToken(secret, userInfo)

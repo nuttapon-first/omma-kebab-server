@@ -29,9 +29,9 @@ type Router struct {
 	*gin.Engine
 }
 
-// func (r *Router) POST(path string, handler func(Context)) {
-// 	r.Engine.POST(path, NewGinHandler(handler))
-// }
+func (r *Router) POST(path string, handler func(Context)) {
+	r.Engine.POST(path, NewGinHandler(handler))
+}
 
 func (r *Router) GET(path string, handler func(Context)) {
 	r.Engine.GET(path, NewGinHandler(handler))

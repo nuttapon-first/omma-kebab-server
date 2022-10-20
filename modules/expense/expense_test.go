@@ -32,7 +32,7 @@ type testCases struct {
 	MessageExpected string
 }
 
-func TestCreateStockFailure(t *testing.T) {
+func TestCreateExpenseFailure(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	testCases := []testCases{
@@ -45,7 +45,7 @@ func TestCreateStockFailure(t *testing.T) {
 				"expenseDetail": "ซื้อผัก",
 			},
 			CodeExpected:    http.StatusBadRequest,
-			MessageExpected: "cost should greater than zero",
+			MessageExpected: "expense cost should greater than zero",
 		},
 	}
 
