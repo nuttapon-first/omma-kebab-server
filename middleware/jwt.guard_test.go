@@ -12,7 +12,7 @@ import (
 
 type testCases struct {
 	Name            string
-	Body            string
+	Body            map[string]string
 	CodeExpected    int
 	MessageExpected string
 }
@@ -29,9 +29,15 @@ func TestAuthorizationMiddleware(t *testing.T) {
 	testCases := []testCases{
 		{
 			Name:            "Test no permission role",
-			Body:            "manager",
+			Body:            map[string]string{"userRole": "manager", "apiRole": "admin"},
 			CodeExpected:    http.StatusForbidden,
 			MessageExpected: "Permission denied",
+		},
+		{
+			Name:            "Test invalid role",
+			Body:            map[string]string{"userRole": "manager", "apiRole": "admins"},
+			CodeExpected:    http.StatusInternalServerError,
+			MessageExpected: "Invalid role authorization",
 		},
 	}
 
@@ -46,14 +52,14 @@ func TestAuthorizationMiddleware(t *testing.T) {
 			c.Request.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 			r.Use(func(c *gin.Context) {
-				c.Set("userRole", val.Body)
+				c.Set("userRole", val.Body["userRole"])
 			})
-			r.Use(Authorization("admin"))
+			r.Use(Authorization(val.Body["apiRole"]))
 			r.POST("/menus", FakeHandler) // Call to a handler method
 			r.ServeHTTP(res, c.Request)
 
 			if status := res.Code; status != val.CodeExpected {
-				t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+				t.Errorf("handler returned wrong status code: got %v want %v", status, val.CodeExpected)
 			}
 
 			response := &response{}
